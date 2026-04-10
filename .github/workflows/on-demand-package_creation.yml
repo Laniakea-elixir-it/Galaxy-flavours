@@ -29,18 +29,18 @@ on:
         type: choice
         description: 'image to use to build the package'
         required: true
-        default: 'galaxy-express_v3.0.2'
+        default: 'galaxy-express,release_24.2_v1.0.4'
         options: 
-          - galaxy-express_v3.0.2
-          - galaxy-express_v4.0.0
+          - galaxy-express,release_25.1_v1.0.0
+          - galaxy-express,release_24.2_v1.0.4
       galaxy_release:
         type: choice
         description: 'Galaxy release'
         required: true
-        default: 'release_20.05'
+        default: 'release_24.2'
         options: 
-          - release_20.05
-          - release_21.09
+          - release_25.1
+          - release_24.2
 
 
   # Allows you to run this workflow manually from the Actions tab
@@ -65,7 +65,7 @@ jobs:
           JnkUser: ${{ secrets.JnkUser }}
           JnkApiKey: ${{ secrets.JnkApiKey }}
         run: |
-          curl -X POST "https://${{ secrets.JnkUser }}:${{ secrets.JnkApiKey }}@build-usegalaxy-it.cloud.ba.infn.it/jenkins/job/flavour_packages_pipeline/buildWithParameters?token=${{ secrets.Token }}&FLAVOR=${{ github.event.inputs.Flavor }}&GALAXY_RELEASE=${{ github.event.inputs.galaxy_release }}&IMAGE=${{ github.event.inputs.Image }}"
+          curl -X POST "https://${{ secrets.JnkUser }}:${{ secrets.JnkApiKey }}@build-usegalaxy-it.cloud.ba.infn.it/jenkins/job/Galaxy-flavours/buildWithParameters?token=${{ secrets.Token }}&FLAVOR=${{ github.event.inputs.Flavor }}&GALAXY_RELEASE=${{ github.event.inputs.galaxy_release }}&IMAGE=${{ github.event.inputs.Image }}"
       
       - name: when flavor is all  
         if: github.event.inputs.Flavor == 'all'
@@ -73,6 +73,4 @@ jobs:
           JnkUser: ${{ secrets.JnkUser }}
           JnkApiKey: ${{ secrets.JnkApiKey }}
         run: |
-          ls | grep -v 'JNK-CI\|workflow\|README.md\|examples'| xargs -L1 -I {} curl -X POST "https://${{ secrets.JnkUser }}:${{ secrets.JnkApiKey }}@build-usegalaxy-it.cloud.ba.infn.it/jenkins/job/flavour_packages_pipeline/buildWithParameters?token=${{ secrets.Token }}&FLAVOR={}&GALAXY_RELEASE=${{ github.event.inputs.galaxy_release }}&IMAGE=${{ github.event.inputs.Image }}"
-
-
+          ls | grep -v 'JNK-CI\|workflow\|README.md\|examples'| xargs -L1 -I {} curl -X POST "https://${{ secrets.JnkUser }}:${{ secrets.JnkApiKey }}@build-usegalaxy-it.cloud.ba.infn.it/jenkins/job/Galaxy-flavours/buildWithParameters?token=${{ secrets.Token }}&FLAVOR={}&GALAXY_RELEASE=${{ github.event.inputs.galaxy_release }}&IMAGE=${{ github.event.inputs.Image }}"
