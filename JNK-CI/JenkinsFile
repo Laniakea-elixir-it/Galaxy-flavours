@@ -4,7 +4,7 @@ pipeline {
 	stages {
 		stage('tools installation and packages creation') {
 			steps {
-				withCredentials([file(credentialsId: 'iam-recas-laniakea-bot-password', variable: 'IAM_CLIENT_PASSWORD')]) {
+                                withCredentials([string(credentialsId: 'iam-recas-laniakea-bot-password', variable: 'IAM_CLIENT_PASSWORD')]) {
 					sh '''
 					# Openstack Access
                                         python3 -m venv build/
