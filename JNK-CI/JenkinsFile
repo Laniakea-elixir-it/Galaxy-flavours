@@ -83,21 +83,25 @@ pipeline {
 			}
 		}
 	}
-		post { 
-			always { 
-				cleanWs()
-			}
-			success {
-				withCredentials([string(credentialsId: 'telegram_bot_API_token', variable: 'API_TOKEN')]) {
-					//				build job: 'package_upload_to_cvmfs'
-					sh 'curl -s -X POST https://api.telegram.org/bot$API_TOKEN/sendMessage -d chat_id=-667232678 -d text="Laniakea express package $FLAVOR:$VERSION for $IMAGE build: SUCCESS!!!"'
-				}
-			}
-			failure {
-				withCredentials([string(credentialsId: 'telegram_bot_API_token', variable: 'API_TOKEN')]) {
-					sh 'curl -s -X POST https://api.telegram.org/bot$API_TOKEN/sendMessage -d chat_id=-667232678 -d text="Laniakea express package $FLAVOR:$VERSION for $IMAGE build: FAILED!!!"'
-				}
-			}
-		}
-	}
+        post {
+                success {
+                        emailext (
+                        subject: '$DEFAULT_SUBJECT',
+                        body: '$DEFAULT_CONTENT',
+                        to: '$DEFAULT_RECIPIENTS',
+                        attachLog: true
+                        )
+                        cleanWs()
+                }
+                failure {
+                        emailext (
+                        subject: '$DEFAULT_SUBJECT',
+                        body: '$DEFAULT_CONTENT',
+                        to: '$DEFAULT_RECIPIENTS',
+                        attachLog: true
+                        )
+                        cleanWs()
+                }
+        }
 
+}
