@@ -9,6 +9,7 @@ pipeline {
 					# Openstack Access
                                         python3 -m venv build/
                                         . build/bin/activate
+                                        pip install -r ./cloud-images/requirements.txt
                                         eval `oidc-agent-service use`
                                         . /home/ubuntu/usegalaxy-it.sh
                                         expect JNK-CI/expect.sh $IAM_CLIENT_PASSWORD
