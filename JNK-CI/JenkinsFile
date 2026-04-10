@@ -15,13 +15,13 @@ pipeline {
                                         export IAM_ACCESS_TOKEN=$(oidc-token iam-recas-laniakea-bot)
                                         export OS_TOKEN=$(openstack --os-auth-type v3oidcaccesstoken --os-access-token ${IAM_ACCESS_TOKEN} token issue  -f json | jq -r ".id")
                                         echo $OS_TOKEN
-                       			## clone the terraform recipe
-					#git clone https://github.com/Laniakea-elixir-it/TerraFormExpress.git 
-					#cd TerraFormExpress 
+                       			# clone the terraform recipe
+					git clone https://github.com/Laniakea-elixir-it/TerraFormExpress.git 
+					cd TerraFormExpress 
                         		## configure the tf provider
-					#terraform init
-                        		## create the infrastructure using the image var selected in the action trigger
-					#terraform apply -auto-approve -var="image_name=$IMAGE"
+					terraform init
+                        		# create the infrastructure using the image var selected in the action trigger
+					terraform apply -auto-approve -var="image_name=$IMAGE"
                         		## save the public ip of the vm 
 					#export VM_IP=$(terraform output -raw public_ip)
 					#echo $VM_IP
