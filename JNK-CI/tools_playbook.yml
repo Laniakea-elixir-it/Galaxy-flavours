@@ -36,11 +36,15 @@
         state: started
         enabled: True
       with_items:
-        - postgresql-10
+        - postgresql-18
         - nginx
-        - galaxy
+        - galaxy-tusd
 
-    - name: remove conda.lock
+    - name: Start Galaxy
+      command: "/usr/local/bin/galaxyctl -c /home/galaxy/galaxy/config/galaxy.yml restart"
+      become: yes
+
+    - name: remove conda.loc
       file:
         path: /export/tool_deps/conda.lock
         state: absent
