@@ -100,6 +100,7 @@ pipeline {
 			sh '''
 			OS_TOKEN=$(cat /tmp/os_token.txt)
 			echo $OS_TOKEN
+			. /home/ubuntu/usegalaxy-it.sh
 			cd TerraFormExpress
 			terraform destroy -auto-approve -var="image_name=$IMAGE"
 			rm /tmp/os_token.txt
