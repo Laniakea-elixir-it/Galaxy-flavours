@@ -44,6 +44,7 @@ pipeline {
 					sed -i s/VM_IP/$VM_IP/g hosts
 					VERSION=$(./packages_vc.sh -c new -f $FLAVOR -d test.db -i $IMAGE -g $GALAXY_RELEASE)
 					ansible-galaxy role install -r requirements.yml -p roles
+					echo $PWD
 					ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i hosts --private-key /home/ubuntu/.ssh/laniakea-robot.key  tools_playbook.yml -e galaxy_flavor=$FLAVOR -e image=$IMAGE
 					#
                         		# Create the tar packages
