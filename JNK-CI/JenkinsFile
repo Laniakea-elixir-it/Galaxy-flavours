@@ -67,7 +67,12 @@ pipeline {
                 		                export OS_TOKEN=$(openstack --os-auth-type v3oidcaccesstoken --os-access-token ${IAM_ACCESS_TOKEN} token issue  -f json | jq -r ".id")
                         		        echo $OS_TOKEN
 						cd JNK-CI
-						ansible-playbook -i hosts --private-key /home/ubuntu/.ssh/laniakea-robot.key swift_upload.yml '''
+						ansible-playbook --private-key /home/ubuntu/.ssh/laniakea-robot.key swift_upload.yml \
+							-i hosts \
+						        -e os_token=\$OS_TOKEN \
+						        -e os_auth_url=\$OS_AUTH_URL \
+						        -e os_project_id=\$OS_PROJECT_ID
+					'''
 				}
 
 
