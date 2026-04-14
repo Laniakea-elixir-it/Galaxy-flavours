@@ -97,22 +97,24 @@ pipeline {
 	}
         post {
                 always{
-			sh '''
-                        . build/bin/activate
-                        eval `oidc-agent-service use`
-                        . /home/ubuntu/usegalaxy-it.sh
-                        expect JNK-CI/expect.sh $IAM_CLIENT_PASSWORD
-                        export IAM_ACCESS_TOKEN=$(oidc-token iam-recas-laniakea-bot)
-                        export OS_TOKEN=$(openstack --os-auth-type v3oidcaccesstoken --os-access-token ${IAM_ACCESS_TOKEN} token issue  -f json | jq -r ".id")
-                        echo $OS_TOKEN
-                        #echo $OS_TOKEN > /tmp/os_token.txt
-			#OS_TOKEN=$(cat /tmp/os_token.txt)
-			#echo $OS_TOKEN
-			#. /home/ubuntu/usegalaxy-it.sh
-			cd TerraFormExpress
-			terraform destroy -auto-approve -var="image_name=$IMAGE"
-			rm /tmp/os_token.txt
-			'''
+                        withCredentials([string(credentialsId: 'iam-recas-laniakea-bot-password', variable: 'IAM_CLIENT_PASSWORD')]) {
+				sh '''
+                        	. build/bin/activate
+                        	eval `oidc-agent-service use`
+                        	. /home/ubuntu/usegalaxy-it.sh
+                        	expect JNK-CI/expect.sh $IAM_CLIENT_PASSWORD
+                        	export IAM_ACCESS_TOKEN=$(oidc-token iam-recas-laniakea-bot)
+                        	export OS_TOKEN=$(openstack --os-auth-type v3oidcaccesstoken --os-access-token ${IAM_ACCESS_TOKEN} token issue  -f json | jq -r ".id")
+                        	echo $OS_TOKEN
+                        	#echo $OS_TOKEN > /tmp/os_token.txt
+				#OS_TOKEN=$(cat /tmp/os_token.txt)
+				#echo $OS_TOKEN
+				#. /home/ubuntu/usegalaxy-it.sh
+				cd TerraFormExpress
+				terraform destroy -auto-approve -var="image_name=$IMAGE"
+				rm /tmp/os_token.txt
+				'''
+			}
 		}
                 success {
                         emailext (
