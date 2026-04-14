@@ -1,0 +1,4 @@
+---
+- name: ansible-role-laniakea-galaxy-tools
+  src: https://github.com/Laniakea-elixir-it/ansible-role-laniakea-galaxy-tools.git
+  version: master
