@@ -119,8 +119,7 @@ pipeline {
                         	export OS_TOKEN=$(openstack --os-auth-type v3oidcaccesstoken --os-access-token ${IAM_ACCESS_TOKEN} token issue  -f json | jq -r ".id")
                         	echo $OS_TOKEN
 				cd TerraFormExpress
-				terraform destroy -auto-approve -var="image_name=$IMAGE"
-				rm /tmp/os_token.txt
+				#terraform destroy -auto-approve -var="image_name=$IMAGE"
 				'''
 			}
 		}
