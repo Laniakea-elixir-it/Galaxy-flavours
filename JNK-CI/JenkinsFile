@@ -18,7 +18,7 @@ pipeline {
                                         export IAM_ACCESS_TOKEN=$(oidc-token iam-recas-laniakea-bot)
                                         export OS_TOKEN=$(openstack --os-auth-type v3oidcaccesstoken --os-access-token ${IAM_ACCESS_TOKEN} token issue  -f json | jq -r ".id")
                                         echo $OS_TOKEN
-			                env.OS_TOKEN = sh(script: 'echo $OS_TOKEN', returnStdout: true).trim()
+					env.OS_TOKEN = sh(script: '''printenv OS_TOKEN''', returnStdout: true).trim()
 					#
 					# Configure Terraform:
                        			# clone the terraform recipe,
