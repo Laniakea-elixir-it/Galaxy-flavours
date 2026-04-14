@@ -18,7 +18,7 @@ pipeline {
                                         export IAM_ACCESS_TOKEN=$(oidc-token iam-recas-laniakea-bot)
                                         export OS_TOKEN=$(openstack --os-auth-type v3oidcaccesstoken --os-access-token ${IAM_ACCESS_TOKEN} token issue  -f json | jq -r ".id")
                                         echo $OS_TOKEN
-					env.OS_TOKEN = sh(script: '''printenv OS_TOKEN''', returnStdout: true).trim()
+					echo $OS_TOKEN > /tmp/os_token.txt
 					#
 					# Configure Terraform:
                        			# clone the terraform recipe,
@@ -98,9 +98,11 @@ pipeline {
         post {
                 always{
 			sh '''
+			OS_TOKEN=$(cat /tmp/os_token.txt)
 			echo $OS_TOKEN
 			cd TerraFormExpress
 			terraform destroy -auto-approve -var="image_name=$IMAGE"
+			rm /tmp/os_token.txt
 			'''
 		}
                 success {
