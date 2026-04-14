@@ -1,36 +1,30 @@
 - hosts: galaxyservers
   gather_facts: no
   become: true
+
   vars:
     role_debug: true
     galaxy_prefix: ":80"
-  roles:
-    - ../../ansible-role-laniakea-galaxy-tools
-  pre_tasks:
 
+  pre_tasks:
     - name: Wait for system to become reachable
       wait_for_connection:
-
     - name: Gather facts for first time
       setup:
-
-        #    - name: remove _conda
-        #      file:
-        #        path: /export/tool_deps/_conda
-        #        state: absent
-    
-    - name: enable test_tool_shed
+    #- name: remove _conda
+    #  file:
+    #    path: /export/tool_deps/_conda
+    #    state: absent
+    - name: Enable test_tool_shed
       copy:
         src: tool_sheds_conf.xml
         dest: /home/galaxy/galaxy/config/tool_sheds_conf.xml
-    
-    - name: change galaxy_config
+    - name: Change galaxy_config
       lineinfile:
         path: /home/galaxy/galaxy/config/galaxy.yml
         regexp: 'tool_sheds_config_file' 
         line: '    tool_sheds_config_file: /home/galaxy/galaxy/config/tool_sheds_conf.xml' 
-
-    - name: start services
+    - name: Start services
       systemd:
         name: "{{ item }}"
         state: started
@@ -39,13 +33,14 @@
         - postgresql-18
         - nginx
         - galaxy-tusd
-
     - name: Start Galaxy
       command: "/usr/local/bin/galaxyctl -c /home/galaxy/galaxy/config/galaxy.yml restart"
       become: yes
-
     - name: remove conda.loc
       file:
         path: /export/tool_deps/conda.lock
         state: absent
 
+  roles:
+    - role: ansible-role-laniakea-galaxy-tools
+      galaxy_tools_base_dir: ../
