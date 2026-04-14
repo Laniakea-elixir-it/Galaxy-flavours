@@ -44,3 +44,6 @@
   roles:
     - role: ansible-role-laniakea-galaxy-tools
       galaxy_tools_base_dir: ../
+      galaxy_bootstrap_user: "bootstrapuser"
+      galaxy_bootstrap_password: "bootstrappwd738387"
+      galaxy_bootstrap_email: "bootstrap@server.com"
