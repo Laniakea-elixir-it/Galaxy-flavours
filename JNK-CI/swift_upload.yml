@@ -7,17 +7,17 @@
       file:
         path: /tmp/dump
         state: directory
+
     - name: create virtualenv and install swift cli
       pip:
         name: ["setuptools_rust", "python-openstackclient", "python-swiftclient"]
         virtualenv: /tmp/swift_venv
         virtualenv_command: python3 -m venv
-    - name: copy credentials
-      template:
-        src: rc.sh.j2
-        dest: /tmp/dump/rc.sh
-        mode: '0600'
+
     - name: upload package on the galaxy_flavors swift container
-      shell: source /tmp/dump/rc.sh && /tmp/swift_venv/bin/swift upload -S 1073741824 --insecure galaxy_flavors galaxy-express*
+      shell: /tmp/swift_venv/bin/swift upload -S 1073741824 --insecure galaxy_flavors galaxy-express*
       args:
         chdir: /tmp/dump
+      environment:
+        OS_TOKEN: "{{ os_token }}"
+        OS_STORAGE_URL: "{{ os_storage_url }}"
