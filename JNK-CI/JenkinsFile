@@ -58,7 +58,7 @@ pipeline {
 		stage('upload to swift'){
 			steps {
 				withCredentials([
-					string(credentialsId: 'iam-recas-laniakea-bot-password', variable: 'IAM_CLIENT_PASSWORD')
+					string(credentialsId: 'iam-recas-laniakea-bot-password', variable: 'IAM_CLIENT_PASSWORD'),
 					string(credentialsId: 'recas-storage-url', variable: 'RECAS_STORAGE_URL')
 					]) {
 					sh '''
