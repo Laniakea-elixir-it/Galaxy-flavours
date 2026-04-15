@@ -32,11 +32,28 @@
         executable: /bin/bash
         chdir: /buffer
 
-    - name: Move package from cvmfs buffer to cvmfs
-      shell: mv -f {{ package.stdout }} /cvmfs/tools.elixir-italy-cvmfs/dump/
-      args:
-        executable: /bin/bash
-        chdir: /buffer
+    - name: Check if target directories already exist
+      stat:
+        path: "/cvmfs/tools.elixir-italy-cvmfs/dump/{{ item }}"
+      loop: "{{ package.stdout.split() }}"
+      register: target_dirs
+
+    - name: Report skipped directories
+      debug:
+        msg: "Skip {{ item.item }}: already exists in destination"
+      loop: "{{ target_dirs.results }}"
+      when: item.stat.exists
+
+    - name: Move only directories that do not already exist
+      command: mv "{{ item.item }}" /cvmfs/tools.elixir-italy-cvmfs/dump/
+      loop: "{{ target_dirs.results }}"
+      when: not item.stat.exists
+
+    #- name: Move package from cvmfs buffer to cvmfs
+    #  shell: mv -f {{ package.stdout }} /cvmfs/tools.elixir-italy-cvmfs/dump/
+    #  args:
+    #    executable: /bin/bash
+    #    chdir: /buffer
     
     - name: CVMFS publish
       shell: cvmfs_server publish tools.elixir-italy-cvmfs
