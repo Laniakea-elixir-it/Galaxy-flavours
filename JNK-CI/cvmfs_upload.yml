@@ -9,32 +9,34 @@
         name: pip
         state: latest
 
-    - name: install swift cli        
+    - name: Create a virtualenv and install swift cli        
       pip:
         name: [ "setuptools_rust","python-openstackclient","python-swiftclient" ]
-    
+        virtualenv: /tmp/swift_venv
+        virtualenv_command: python3 -m venv
 
-    - name: source openstack credentials and download container in the cvmfs buffer
-      shell: source /buffer/usegalaxy-it-openrc.sh && swift download galaxy_flavors
+
+    - name: Download container in the cvmfs buffer
+      shell: /tmp/swift_venv/bin/swift download --os-auth-token '{{ os_token }}' --os-storage-url '{{ os_storage_url }}'galaxy_flavors
       args:
         executable: /bin/bash
         chdir: /buffer
 
-    - name: save downloaded package in a variable to clean after
+    - name: Save downloaded package in a variable to clean after
       shell: echo galaxy-express*
       args:
         executable: /bin/bash
         chdir: /buffer
       register: package 
     
-    - name: open cvmfs transaction
+    - name: Open cvmfs transaction
       shell: cvmfs_server transaction tools.elixir-italy-cvmfs
       args:
         executable: /bin/bash
         chdir: /buffer
 
 
-    - name: mv package from cvmfs buffer to cvmfs
+    - name: Move package from cvmfs buffer to cvmfs
       shell: mv -f "{{ package.stdout }}" /cvmfs/tools.elixir-italy-cvmfs/dump/
       args:
         executable: /bin/bash
