@@ -121,10 +121,10 @@ pipeline {
                                                 export OS_TOKEN=$(openstack --os-auth-type v3oidcaccesstoken --os-access-token ${IAM_ACCESS_TOKEN} token issue  -f json | jq -r ".id")
                                                 echo $OS_TOKEN
                                                 cd JNK-CI
-						ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook cvmfs_upload.yml \
-                                                        -i hosts \
-                                                        -e os_token=\$OS_TOKEN \
-                                                        -e os_storage_url=\$RECAS_STORAGE_URL
+						#ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook cvmfs_upload.yml \
+                                                #        -i hosts \
+                                                #        -e os_token=\$OS_TOKEN \
+                                                #        -e os_storage_url=\$RECAS_STORAGE_URL
 					'''
 				}
 			}
