@@ -45,7 +45,7 @@
         chdir: /buffer
     
     - name: clean container 
-      shell: source /buffer/usegalaxy-it-openrc.sh && swift delete galaxy_flavors -p "{{ package.stdout }}"
+      shell: /tmp/swift_venv/bin/swift delete galaxy_flavors -p '{{ package.stdout }}' --os-auth-token '{{ os_token }}' --os-storage-url '{{ os_storage_url }}'
       args:
         executable: /bin/bash
         chdir: /buffer
