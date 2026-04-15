@@ -64,7 +64,7 @@ pipeline {
 
 			}
 		}
-		stage('upload to swift'){
+		stage('Upload to swift'){
 			steps {
 				withCredentials([
 					string(credentialsId: 'iam-recas-laniakea-bot-password', variable: 'IAM_CLIENT_PASSWORD'),
@@ -89,7 +89,7 @@ pipeline {
 
 			}
 		}
-		stage('delete vm'){
+		stage('Delete vm'){
 			steps {
                         	withCredentials([string(credentialsId: 'iam-recas-laniakea-bot-password', variable: 'IAM_CLIENT_PASSWORD')]) {
                         	        sh '''
@@ -106,7 +106,7 @@ pipeline {
                         	}
 			}
 		}
-		stage('upload_to_cvmfs') {
+		stage('Upload to cvmfs') {
 			steps {
                                 withCredentials([
                                         string(credentialsId: 'iam-recas-laniakea-bot-password', variable: 'IAM_CLIENT_PASSWORD'),
@@ -129,7 +129,7 @@ pipeline {
 				}
 			}
 		}
-		stage('write-to-db') {
+		stage('Write to sqlite3 db') {
 			steps {
 				sh ''' 
 					cd JNK-CI && ./packages_vc.sh -c create -f $FLAVOR -d test.db -i $IMAGE -g $GALAXY_RELEASE
