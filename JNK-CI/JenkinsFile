@@ -6,12 +6,12 @@ pipeline {
 			steps {
                                 withCredentials([string(credentialsId: 'iam-recas-laniakea-bot-password', variable: 'IAM_CLIENT_PASSWORD')]) {
 					sh '''
-					####
-					#### Openstack Access
-					####
-                                        ###python3 -m venv build/
-                                        ###. build/bin/activate
-                                        ###pip install -r ./JNK-CI/requirements.txt
+					#
+					# Openstack Access
+					#
+                                        python3 -m venv build/
+                                        . build/bin/activate
+                                        pip install -r ./JNK-CI/requirements.txt
                                         ###eval `oidc-agent-service use`
                                         ###. /home/ubuntu/usegalaxy-it.sh
                                         ###expect JNK-CI/expect.sh $IAM_CLIENT_PASSWORD
