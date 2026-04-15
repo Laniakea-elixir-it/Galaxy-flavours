@@ -16,6 +16,19 @@ pipeline {
 		stage('Tools installation and packages creation') {
 			steps {
                                 withCredentials([string(credentialsId: 'iam-recas-laniakea-bot-password', variable: 'IAM_CLIENT_PASSWORD')]) {
+
+                    			script {
+                    			    env.VERSION = sh(
+                    			        script: '''
+                    			            cd JNK-CI
+                    			            ./packages_vc.sh -c new -f "$FLAVOR" -d test.db -i "$IMAGE" -g "$GALAXY_RELEASE"
+                    			        ''',
+                    			        returnStdout: true
+                    			    ).trim()
+                    			}
+
+					echo "VERSION=${env.VERSION}"
+
 					sh '''
 					#
 					# Openstack Access
@@ -28,6 +41,7 @@ pipeline {
                                         export OS_TOKEN=$(openstack --os-auth-type v3oidcaccesstoken --os-access-token ${IAM_ACCESS_TOKEN} token issue  -f json | jq -r ".id")
                                         echo $OS_TOKEN
 					echo $OS_TOKEN > /tmp/os_token.txt
+
 					#
 					# Configure Terraform:
                        			# clone the terraform recipe,
@@ -42,6 +56,7 @@ pipeline {
 					export VM_IP=$(terraform output -raw public_ip)
 					echo $VM_IP
 					cd ..
+
 					#
 					# Configure Ansible and install the Tools:
                         		# clone the tools ansible role,
@@ -51,11 +66,11 @@ pipeline {
 					#
 					cd JNK-CI
 					sed -i s/VM_IP/$VM_IP/g hosts
-					VERSION=$(./packages_vc.sh -c new -f $FLAVOR -d test.db -i $IMAGE -g $GALAXY_RELEASE)
 					echo $VERSION
 					ansible-galaxy role install -r requirements.yml -p roles
 					echo $PWD
 					ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i hosts --private-key /home/ubuntu/.ssh/laniakea-robot.key  tools_playbook.yml -e galaxy_flavor=$FLAVOR -e image=$IMAGE
+
 					#
                         		# Create the tar packages
 					#
