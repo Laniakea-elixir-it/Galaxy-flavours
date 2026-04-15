@@ -15,9 +15,6 @@
         virtualenv_command: python3 -m venv
 
     - name: upload package on the galaxy_flavors swift container
-      shell: /tmp/swift_venv/bin/swift upload -S 1073741824 --insecure galaxy_flavors galaxy-express*
+      shell: /tmp/swift_venv/bin/swift upload --os-auth-token '{{ os_token }}' --os-storage-url '{{ os_storage_url }}' -S 1073741824 --insecure galaxy_flavors galaxy-express*
       args:
         chdir: /tmp/dump
-      environment:
-        OS_TOKEN: "{{ os_token }}"
-        OS_STORAGE_URL: "{{ os_storage_url }}"
