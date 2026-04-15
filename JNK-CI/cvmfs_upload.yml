@@ -4,11 +4,6 @@
   become: true
   tasks:
 
-    - name: upgrade pip        
-      pip:
-        name: pip
-        state: latest
-
     - name: Create a virtualenv and install swift cli        
       pip:
         name: [ "setuptools_rust","python-openstackclient","python-swiftclient" ]
