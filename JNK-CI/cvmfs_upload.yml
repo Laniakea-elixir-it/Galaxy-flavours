@@ -10,7 +10,6 @@
         virtualenv: /tmp/swift_venv
         virtualenv_command: python3 -m venv
 
-
     - name: Download container in the cvmfs buffer
       shell: /tmp/swift_venv/bin/swift download --os-auth-token '{{ os_token }}' --os-storage-url '{{ os_storage_url }}' galaxy_flavors
       args:
@@ -24,12 +23,14 @@
         chdir: /buffer
       register: package 
     
+    - debug:
+        msg: '{{ package }}'
+
     - name: Open cvmfs transaction
       shell: cvmfs_server transaction tools.elixir-italy-cvmfs
       args:
         executable: /bin/bash
         chdir: /buffer
-
 
     - name: Move package from cvmfs buffer to cvmfs
       shell: mv -f "{{ package.stdout }}" /cvmfs/tools.elixir-italy-cvmfs/dump/
@@ -37,7 +38,6 @@
         executable: /bin/bash
         chdir: /buffer
     
-
     - name: CVMFS publish
       shell: cvmfs_server publish tools.elixir-italy-cvmfs
       args:
