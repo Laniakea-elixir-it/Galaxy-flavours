@@ -2,16 +2,25 @@ pipeline {
 	agent { label 'build-usegalaxy-it.wn1' }
 	options { disableConcurrentBuilds() }
 	stages {
-		stage('tools installation and packages creation') {
+		stage('Create build environment') {
+			steps {
+			       	withCredentials([string(credentialsId: 'iam-recas-laniakea-bot-password', variable: 'IAM_CLIENT_PASSWORD')]) {
+                                        sh '''
+                                        python3 -m venv build/
+                                        . build/bin/activate
+                                        pip install -r ./JNK-CI/requirements.txt
+					'''
+				}
+			}
+		}
+		stage('Tools installation and packages creation') {
 			steps {
                                 withCredentials([string(credentialsId: 'iam-recas-laniakea-bot-password', variable: 'IAM_CLIENT_PASSWORD')]) {
 					sh '''
 					#
 					# Openstack Access
 					#
-                                        python3 -m venv build/
                                         . build/bin/activate
-                                        pip install -r ./JNK-CI/requirements.txt
                                         ###eval `oidc-agent-service use`
                                         ###. /home/ubuntu/usegalaxy-it.sh
                                         ###expect JNK-CI/expect.sh $IAM_CLIENT_PASSWORD
