@@ -12,7 +12,7 @@
 
 
     - name: Download container in the cvmfs buffer
-      shell: /tmp/swift_venv/bin/swift download --os-auth-token '{{ os_token }}' --os-storage-url '{{ os_storage_url }}'galaxy_flavors
+      shell: /tmp/swift_venv/bin/swift download --os-auth-token '{{ os_token }}' --os-storage-url '{{ os_storage_url }}' galaxy_flavors
       args:
         executable: /bin/bash
         chdir: /buffer
