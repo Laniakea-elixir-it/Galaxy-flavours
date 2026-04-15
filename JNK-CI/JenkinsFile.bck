@@ -2,25 +2,16 @@ pipeline {
 	agent { label 'build-usegalaxy-it.wn1' }
 	options { disableConcurrentBuilds() }
 	stages {
-		stage('Create build environment') {
-			steps {
-			       	withCredentials([string(credentialsId: 'iam-recas-laniakea-bot-password', variable: 'IAM_CLIENT_PASSWORD')]) {
-                                        sh '''
-                                        python3 -m venv build/
-                                        . build/bin/activate
-                                        pip install -r ./JNK-CI/requirements.txt
-					'''
-				}
-			}
-		}
-		stage('Tools installation and packages creation') {
+		stage('tools installation and packages creation') {
 			steps {
                                 withCredentials([string(credentialsId: 'iam-recas-laniakea-bot-password', variable: 'IAM_CLIENT_PASSWORD')]) {
 					sh '''
 					#
 					# Openstack Access
 					#
+                                        python3 -m venv build/
                                         . build/bin/activate
+                                        pip install -r ./JNK-CI/requirements.txt
                                         eval `oidc-agent-service use`
                                         . /home/ubuntu/usegalaxy-it.sh
                                         expect JNK-CI/expect.sh $IAM_CLIENT_PASSWORD
@@ -52,7 +43,6 @@ pipeline {
 					cd JNK-CI
 					sed -i s/VM_IP/$VM_IP/g hosts
 					VERSION=$(./packages_vc.sh -c new -f $FLAVOR -d test.db -i $IMAGE -g $GALAXY_RELEASE)
-					echo $VERSION
 					ansible-galaxy role install -r requirements.yml -p roles
 					echo $PWD
 					ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i hosts --private-key /home/ubuntu/.ssh/laniakea-robot.key  tools_playbook.yml -e galaxy_flavor=$FLAVOR -e image=$IMAGE
@@ -65,7 +55,7 @@ pipeline {
 
 			}
 		}
-		stage('Upload to swift'){
+		stage('upload to swift'){
 			steps {
 				withCredentials([
 					string(credentialsId: 'iam-recas-laniakea-bot-password', variable: 'IAM_CLIENT_PASSWORD'),
@@ -90,7 +80,7 @@ pipeline {
 
 			}
 		}
-		stage('Delete vm'){
+		stage('delete vm'){
 			steps {
                         	withCredentials([string(credentialsId: 'iam-recas-laniakea-bot-password', variable: 'IAM_CLIENT_PASSWORD')]) {
                         	        sh '''
@@ -107,7 +97,7 @@ pipeline {
                         	}
 			}
 		}
-		stage('Upload to cvmfs') {
+		stage('upload_to_cvmfs') {
 			steps {
                                 withCredentials([
                                         string(credentialsId: 'iam-recas-laniakea-bot-password', variable: 'IAM_CLIENT_PASSWORD'),
@@ -130,14 +120,16 @@ pipeline {
 				}
 			}
 		}
-		stage('Write to sqlite3 db') {
+		stage('write-to-db') {
 			steps {
-				sh ''' 
-					cd JNK-CI && ./packages_vc.sh -c create -f $FLAVOR -d test.db -i $IMAGE -g $GALAXY_RELEASE
-					git add test.db
-					git commit -m "update flavor version"
-					git push origin HEAD:master
-				''' 
+				withCredentials([sshUserPrivateKey(credentialsId: 'flavours_key', keyFileVariable: 'SSH_KEY')]) {
+					sh ''' 
+						cd JNK-CI && ./packages_vc.sh -c create -f $FLAVOR -d test.db -i $IMAGE -g $GALAXY_RELEASE
+						git add test.db
+						git commit -m "update flavor version"
+						git push origin HEAD:master
+						''' 
+				}
 			}
 		}
 	}
