@@ -30,51 +30,43 @@ pipeline {
 					echo "VERSION=${env.VERSION}"
 
 					sh '''
-					####
-					#### Openstack Access
-					####
-                                        ###. build/bin/activate
-                                        ###eval `oidc-agent-service use`
-                                        ###. /home/ubuntu/usegalaxy-it.sh
-                                        ###expect JNK-CI/expect.sh $IAM_CLIENT_PASSWORD
-                                        ###export IAM_ACCESS_TOKEN=$(oidc-token iam-recas-laniakea-bot)
-                                        ###export OS_TOKEN=$(openstack --os-auth-type v3oidcaccesstoken --os-access-token ${IAM_ACCESS_TOKEN} token issue  -f json | jq -r ".id")
-                                        ###echo $OS_TOKEN
-					###echo $OS_TOKEN > /tmp/os_token.txt
+					# Openstack Access
+                                        . build/bin/activate
+                                        eval `oidc-agent-service use`
+                                        . /home/ubuntu/usegalaxy-it.sh
+                                        expect JNK-CI/expect.sh $IAM_CLIENT_PASSWORD
+                                        export IAM_ACCESS_TOKEN=$(oidc-token iam-recas-laniakea-bot)
+                                        export OS_TOKEN=$(openstack --os-auth-type v3oidcaccesstoken --os-access-token ${IAM_ACCESS_TOKEN} token issue  -f json | jq -r ".id")
+                                        echo $OS_TOKEN
+					echo $OS_TOKEN > /tmp/os_token.txt
 
-					####
-					#### Configure Terraform:
-                       			#### clone the terraform recipe,
-                        		#### configure the tf provider,
-                        		#### create the infrastructure using the image var selected in the action trigger,
-                        		#### save the public ip of the VM to configure the host file later.
-					####
-					###git clone https://github.com/Laniakea-elixir-it/TerraFormExpress.git 
-					###cd TerraFormExpress
-					###terraform init
-					###terraform apply -auto-approve -var="image_name=$IMAGE"
-					###export VM_IP=$(terraform output -raw public_ip)
-					###echo $VM_IP
-					###cd ..
+					# Configure Terraform:
+                       			# clone the terraform recipe,
+                        		# configure the tf provider,
+                        		# create the infrastructure using the image var selected in the action trigger,
+                        		# save the public ip of the VM to configure the host file later.
+					git clone https://github.com/Laniakea-elixir-it/TerraFormExpress.git 
+					cd TerraFormExpress
+					terraform init
+					terraform apply -auto-approve -var="image_name=$IMAGE"
+					export VM_IP=$(terraform output -raw public_ip)
+					echo $VM_IP
+					cd ..
 
-					####
-					#### Configure Ansible and install the Tools:
-                        		#### clone the tools ansible role,
-                        		#### set in the ansible inventory the vm IP,
-                       			#### set the package version 
-                        		#### install flavour tools.
-					####
-					###cd JNK-CI
-					###sed -i s/VM_IP/$VM_IP/g hosts
-					###echo $VERSION
-					###ansible-galaxy role install -r requirements.yml -p roles
-					###echo $PWD
-					###ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i hosts --private-key /home/ubuntu/.ssh/laniakea-robot.key  tools_playbook.yml -e galaxy_flavor=$FLAVOR -e image=$IMAGE
+					# Configure Ansible and install the Tools:
+                        		# clone the tools ansible role,
+                        		# set in the ansible inventory the vm IP,
+                       			# set the package version 
+                        		# install flavour tools.
+					cd JNK-CI
+					sed -i s/VM_IP/$VM_IP/g hosts
+					echo $VERSION
+					ansible-galaxy role install -r requirements.yml -p roles
+					echo $PWD
+					ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i hosts --private-key /home/ubuntu/.ssh/laniakea-robot.key  tools_playbook.yml -e galaxy_flavor=$FLAVOR -e image=$IMAGE
 
-					####
-                        		#### Create the tar packages
-					####
-					###ansible-playbook -i hosts --private-key /home/ubuntu/.ssh/laniakea-robot.key dump.yml -e ansible_python_interpreter=/usr/bin/python -e image=$IMAGE -e galaxy_flavor=$FLAVOR -e galaxy_flavor_version=$VERSION
+                        		# Create the tar packages
+					ansible-playbook -i hosts --private-key /home/ubuntu/.ssh/laniakea-robot.key dump.yml -e ansible_python_interpreter=/usr/bin/python -e image=$IMAGE -e galaxy_flavor=$FLAVOR -e galaxy_flavor_version=$VERSION
 					'''
 				}
 
@@ -87,25 +79,25 @@ pipeline {
 					string(credentialsId: 'recas-storage-url', variable: 'RECAS_STORAGE_URL')
 					]) {
 					sh '''
-					###. build/bin/activate
-		                        ###eval `oidc-agent-service use`
-                		        ###. /home/ubuntu/usegalaxy-it.sh
-                                	###expect JNK-CI/expect.sh $IAM_CLIENT_PASSWORD
-		                        ###export IAM_ACCESS_TOKEN=$(oidc-token iam-recas-laniakea-bot)
-                		        ###export OS_TOKEN=$(openstack --os-auth-type v3oidcaccesstoken --os-access-token ${IAM_ACCESS_TOKEN} token issue  -f json | jq -r ".id")
-                        		###echo $OS_TOKEN
-					###cd JNK-CI
-					###ansible-playbook --private-key /home/ubuntu/.ssh/laniakea-robot.key swift_upload.yml \
-					###	-i hosts \
-					###        -e os_token=\$OS_TOKEN \
-					###        -e os_storage_url=\$RECAS_STORAGE_URL
+					. build/bin/activate
+		                        eval `oidc-agent-service use`
+                		        . /home/ubuntu/usegalaxy-it.sh
+                                	expect JNK-CI/expect.sh $IAM_CLIENT_PASSWORD
+		                        export IAM_ACCESS_TOKEN=$(oidc-token iam-recas-laniakea-bot)
+                		        export OS_TOKEN=$(openstack --os-auth-type v3oidcaccesstoken --os-access-token ${IAM_ACCESS_TOKEN} token issue  -f json | jq -r ".id")
+                        		echo $OS_TOKEN
+					cd JNK-CI
+					ansible-playbook --private-key /home/ubuntu/.ssh/laniakea-robot.key swift_upload.yml \
+						-i hosts \
+					        -e os_token=\$OS_TOKEN \
+					        -e os_storage_url=\$RECAS_STORAGE_URL
 					'''
 				}
 
 
 			}
 		}
-		stage('Delete vm'){
+		stage('Delete VM'){
 			steps {
                         	withCredentials([
 					string(credentialsId: 'iam-recas-laniakea-bot-password', variable: 'IAM_CLIENT_PASSWORD')]) {
@@ -125,28 +117,28 @@ pipeline {
                         	}
 			}
 		}
-		stage('Upload to cvmfs') {
+		stage('Upload to CVMFS') {
 			steps {
                                 withCredentials([
                                         string(credentialsId: 'iam-recas-laniakea-bot-password', variable: 'IAM_CLIENT_PASSWORD'),
                                         string(credentialsId: 'recas-storage-url', variable: 'RECAS_STORAGE_URL')
                                         ]) {
 					sh'''
-  	                                	. build/bin/activate
-                                        	eval `oidc-agent-service use`
-                                                . /home/ubuntu/usegalaxy-it.sh
-                                                expect JNK-CI/expect.sh $IAM_CLIENT_PASSWORD
-                                                export IAM_ACCESS_TOKEN=$(oidc-token iam-recas-laniakea-bot)
-                                                export OS_TOKEN=$(openstack --os-auth-type v3oidcaccesstoken --os-access-token ${IAM_ACCESS_TOKEN} token issue  -f json | jq -r ".id")
-                                                echo $OS_TOKEN
-                                                cd JNK-CI
-						ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook cvmfs_upload.yml \
-                                                        -i hosts \
-                                                        -e os_token=\$OS_TOKEN \
-                                                        -e os_storage_url=\$RECAS_STORAGE_URL \
-							-e image=\$IMAGE \
-							-e flavor=\$FLAVOR \
-							-e version=\$VERSION
+  	                                . build/bin/activate
+                                        eval `oidc-agent-service use`
+                                        . /home/ubuntu/usegalaxy-it.sh
+                                        expect JNK-CI/expect.sh $IAM_CLIENT_PASSWORD
+                                        export IAM_ACCESS_TOKEN=$(oidc-token iam-recas-laniakea-bot)
+                                        export OS_TOKEN=$(openstack --os-auth-type v3oidcaccesstoken --os-access-token ${IAM_ACCESS_TOKEN} token issue  -f json | jq -r ".id")
+                                        echo $OS_TOKEN
+                                        cd JNK-CI
+					ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook cvmfs_upload.yml \
+                                                -i hosts \
+                                                -e os_token=\$OS_TOKEN \
+                                                -e os_storage_url=\$RECAS_STORAGE_URL \
+						-e image=\$IMAGE \
+						-e flavor=\$FLAVOR \
+						-e version=\$VERSION
 					'''
 				}
 			}
@@ -154,10 +146,10 @@ pipeline {
 		stage('Write to sqlite3 db') {
 			steps {
 				sh ''' 
-					cd JNK-CI && ./packages_vc.sh -c create -f $FLAVOR -d test.db -i $IMAGE -g $GALAXY_RELEASE
-					git add test.db
-					git commit -m "update flavor version"
-					git push origin HEAD:master
+				cd JNK-CI && ./packages_vc.sh -c create -f $FLAVOR -d test.db -i $IMAGE -g $GALAXY_RELEASE
+				git add test.db
+				git commit -m "update flavor version"
+				git push origin HEAD:master
 				''' 
 			}
 		}
