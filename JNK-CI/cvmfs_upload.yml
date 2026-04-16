@@ -48,10 +48,10 @@
     #- name: Clean container 
     #  shell: >
     #    /tmp/swift_venv/bin/swift delete
-    #    galaxy_flavors
-    #    -p '{{ package  }}'
     #    --os-auth-token '{{ os_token }}'
     #    --os-storage-url '{{ os_storage_url }}'
+    #    galaxy_flavors
+    #    --prefix '{{ package }}/'
     #  args:
     #    executable: /bin/bash
     #    chdir: /buffer
