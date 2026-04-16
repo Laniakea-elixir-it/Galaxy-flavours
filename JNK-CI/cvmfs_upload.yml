@@ -3,7 +3,7 @@
   hosts: cvmfs
   become: true
   vars:
-    package: '{{ image }}__{{ flavor }}_{{ version }}'
+    package: '{{ image }}__{{ release }}__{{ flavor }}__{{ version }}'
   tasks:
 
     - name: Create a virtualenv and install swift cli        
