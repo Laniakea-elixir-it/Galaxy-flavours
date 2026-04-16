@@ -67,7 +67,8 @@ sudo su - postgres << BASH
 pg_dump -f galaxy_tools.psql galaxy_tools;
 BASH
 
-g_version=$( cd $G_SERVER_DIR && git branch | awk '/release/ { print $2}')
+#g_version=$( cd $G_SERVER_DIR && git branch | awk '/release/ { print $2}')
+g_version=$(su - galaxy -c "cd $G_SERVER_DIR && git branch | awk '/release/ { print \$2}'")
 DUMP_DIR=${DUMP_ROOT}/${image}_${g_version}_${f_name}_${f_version}
 mkdir -p $DUMP_DIR && chown -R galaxy:galaxy $DUMP_DIR ;
 mv /var/lib/pgsql/galaxy_tools.psql $DUMP_DIR/dump.psql &>$DUMP_DIR/dump.log &
