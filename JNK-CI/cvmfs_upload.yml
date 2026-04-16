@@ -2,6 +2,8 @@
 - name: upload package on cvmfs
   hosts: cvmfs
   become: true
+  vars:
+    package: '{{ image }}__{{ flavor }}_{{ version }}'
   tasks:
 
     - name: Create a virtualenv and install swift cli        
@@ -10,21 +12,20 @@
         virtualenv: /tmp/swift_venv
         virtualenv_command: python3 -m venv
 
-    - name: Download container in the cvmfs buffer
-      shell: /tmp/swift_venv/bin/swift download --os-auth-token '{{ os_token }}' --os-storage-url '{{ os_storage_url }}' galaxy_flavors
-      args:
-        executable: /bin/bash
-        chdir: /buffer
-
-    - name: Save downloaded package in a variable to clean after
-      shell: echo galaxy-express*
-      args:
-        executable: /bin/bash
-        chdir: /buffer
-      register: package 
-    
-    - debug:
+    - name: Package to download
+      debug:
         msg: '{{ package }}'
+
+    - name: Download container in the cvmfs buffer
+      shell: >
+        /tmp/swift_venv/bin/swift download
+        --os-auth-token '{{ os_token }}'
+        --os-storage-url '{{ os_storage_url }}'
+        galaxy_flavors
+        '{{ package }}'
+      args:
+        executable: /bin/bash
+        chdir: /buffer
 
     - name: Open cvmfs transaction
       shell: cvmfs_server transaction tools.elixir-italy-cvmfs
@@ -33,7 +34,7 @@
         chdir: /buffer
 
     - name: Move package from cvmfs buffer to cvmfs
-      shell: mv -f {{ package.stdout }} /cvmfs/tools.elixir-italy-cvmfs/dump/
+      shell: mv -f {{ package }} /cvmfs/tools.elixir-italy-cvmfs/dump/
       args:
         executable: /bin/bash
         chdir: /buffer
@@ -44,8 +45,13 @@
         executable: /bin/bash
         chdir: /buffer
     
-    #- name: clean container 
-    #  shell: /tmp/swift_venv/bin/swift delete galaxy_flavors -p '{{ package.stdout }}' --os-auth-token '{{ os_token }}' --os-storage-url '{{ os_storage_url }}'
+    #- name: Clean container 
+    #  shell: >
+    #    /tmp/swift_venv/bin/swift delete
+    #    galaxy_flavors
+    #    -p '{{ package  }}'
+    #    --os-auth-token '{{ os_token }}'
+    #    --os-storage-url '{{ os_storage_url }}'
     #  args:
     #    executable: /bin/bash
     #    chdir: /buffer
