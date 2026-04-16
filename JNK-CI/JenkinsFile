@@ -137,6 +137,7 @@ pipeline {
                                                 -e os_token=\$OS_TOKEN \
                                                 -e os_storage_url=\$RECAS_STORAGE_URL \
 						-e image=\$IMAGE \
+						-e release=\$GALAXY_RELEASE \
 						-e flavor=\$FLAVOR \
 						-e version=\$VERSION
 					'''
