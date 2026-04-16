@@ -22,7 +22,7 @@
         --os-auth-token '{{ os_token }}'
         --os-storage-url '{{ os_storage_url }}'
         galaxy_flavors
-        '{{ package }}'
+        --prefix '{{ package }}/'
       args:
         executable: /bin/bash
         chdir: /buffer
