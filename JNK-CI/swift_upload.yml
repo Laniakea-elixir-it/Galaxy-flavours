@@ -5,7 +5,7 @@
   tasks:
     - name: create dump dir
       file:
-        path: /tmp/dump
+        path: /export/dump
         state: directory
 
     - name: create virtualenv and install swift cli
@@ -17,4 +17,4 @@
     - name: upload package on the galaxy_flavors swift container
       shell: /tmp/swift_venv/bin/swift upload --os-auth-token '{{ os_token }}' --os-storage-url '{{ os_storage_url }}' -S 1073741824 --insecure galaxy_flavors galaxy-express*
       args:
-        chdir: /tmp/dump
+        chdir: /export/dump

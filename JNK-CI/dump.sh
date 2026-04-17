@@ -15,7 +15,7 @@ usage() { echo "Usage $0:
 -i image
 optional:
 
--d dump_dir: directory that will contain the flavour package Files DEFAULT: /tmp/dump
+-d dump_dir: directory that will contain the flavour package Files DEFAULT: /export/dump
 -c galaxy root directory DEFAULT /home/galaxy/galaxy
 -s galaxy shedtools dir  DEFAULT /home/galaxy/galaxy/var/shed_tools
 -t conda dir DEFAULT /export/tool_deps/_conda
