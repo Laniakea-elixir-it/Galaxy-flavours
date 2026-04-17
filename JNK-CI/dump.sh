@@ -5,6 +5,7 @@
 #- copy the shed_tool_conf.xml file  in $DUMP_DIR
 
 DUMP_ROOT=/export/dump
+G_FLAVOUR_DIR=/tmp/Galaxy-flavours
 G_DIR=/home/galaxy/galaxy
 G_SHEDTOOLS_DIR=/home/galaxy/galaxy/var/shed_tools
 G_CONDA_DIR=/export/tool_deps/_conda
@@ -90,7 +91,7 @@ fi
 
 wait
 
-WORKFLOW_DIR="/data/Galaxy-flavours/${f_name}/workflows"
+WORKFLOW_DIR=$G_FLAVOUR_DIR/${f_name}/workflows
 
 if [ -d "$WORKFLOW_DIR" ];
 
