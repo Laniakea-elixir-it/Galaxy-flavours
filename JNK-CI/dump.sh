@@ -4,7 +4,7 @@
 #- create the _conda directory and shed_tool dir tarball  in $DUMP_DIR
 #- copy the shed_tool_conf.xml file  in $DUMP_DIR
 
-DUMP_ROOT=/tmp/dump
+DUMP_ROOT=/export/dump
 G_DIR=/home/galaxy/galaxy
 G_SHEDTOOLS_DIR=/home/galaxy/galaxy/var/shed_tools
 G_CONDA_DIR=/export/tool_deps/_conda
